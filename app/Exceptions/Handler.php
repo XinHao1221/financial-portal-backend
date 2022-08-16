@@ -47,4 +47,16 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $e)
+    {
+        // Throw if email already registered
+        if ($e instanceof UserExistException) {
+            return response()->json([
+                "message" => "Email already registered. Please login",
+            ]);
+        }
+
+        return parent::render($request, $e);
+    }
 }
