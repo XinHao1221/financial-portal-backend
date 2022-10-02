@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Providers;
+namespace App\Listeners;
 
 use App\Models\Category;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -22,10 +21,10 @@ class SeedDefaultCategoryData
     /**
      * Handle the event.
      *
-     * @param  \Illuminate\Auth\Events\Registered  $event
+     * @param  object  $event
      * @return void
      */
-    public function handle(Registered $event)
+    public function handle($event)
     {
         // Default categories
         $categories = [

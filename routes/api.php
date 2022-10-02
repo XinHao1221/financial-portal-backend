@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\Transaction\TransactionController;
+use GuzzleHttp\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +29,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.reset');
 });
+
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::resource('transaction', TransactionController::class);
+});
+
+
+// Route::resource('transaction', TransactionController::class)->middleware(['auth:sanctum']);
+// Route::post('transaction', [TransactionController::class, 'store'])->middleware(['auth:sanctum']);
