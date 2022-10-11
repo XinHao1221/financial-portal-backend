@@ -14,7 +14,7 @@ class Controller extends BaseController
     protected $modelClass;
     protected $reousrceClass;
 
-    protected function commonJsonResponse($data, $message)
+    protected function commonJsonResponse($data, $message = null)
     {
         return response()->json([
             'data' => $data,

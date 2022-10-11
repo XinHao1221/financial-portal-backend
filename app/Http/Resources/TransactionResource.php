@@ -21,6 +21,7 @@ class TransactionResource extends JsonResource
             'description' => $this->description,
             'amount' => $this->amount,
             'datetime' => $this->datetime,
+            'is_income' => $this->is_income
         ];
     }
 }

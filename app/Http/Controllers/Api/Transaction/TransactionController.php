@@ -15,9 +15,17 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'start_date' => ['required', 'date_format:Y-m-d H:i:s'],
+            'end_date' => ['required', 'date_format:Y-m-d H:i:s']
+        ]);
+
+        $transactions = Transaction::where('datetime', '>=', $validatedData['start_date'])
+            ->where('datetime', '<=', $validatedData['end_date'])->get();
+
+        return $this->commonJsonResponse(TransactionResource::collection($transactions));
     }
 
     /**
@@ -68,7 +76,9 @@ class TransactionController extends Controller
      */
     public function show($id)
     {
-        //
+        $transaction = Transaction::where('user_id', auth()->user()->id)->findOrFail($id);
+
+        return $this->commonJsonResponse(new TransactionResource($transaction));
     }
 
     /**

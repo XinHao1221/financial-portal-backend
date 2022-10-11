@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\ConstantController;
 use App\Http\Controllers\Api\Transaction\TransactionController;
 use GuzzleHttp\Middleware;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('transaction', TransactionController::class);
+    Route::get('constant', ConstantController::class);
 });
 
 
