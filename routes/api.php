@@ -32,7 +32,13 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::resource('transactions', TransactionController::class);
+    // Transaction
+    Route::group(['prefix' => 'transactions'], function () {
+        Route::resource('', TransactionController::class);
+        Route::get('summary', [TransactionController::class, 'transactionSummary']);
+    });
+
+    // Lookup
     Route::get('constant', ConstantController::class);
 });
 

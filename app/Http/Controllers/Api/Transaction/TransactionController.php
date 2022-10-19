@@ -113,4 +113,25 @@ class TransactionController extends Controller
     public function destroy($id)
     {
     }
+
+    public function transactionSummary(Request $request)
+    {
+
+        $validatedData = $request->validate([
+            'start_date' => ['required', 'date_format:Y-m-d H:i:s'],
+            'end_date' => ['required', 'date_format:Y-m-d H:i:s']
+        ]);
+
+        $transactions = Transaction::where('datetime', '>=', $validatedData['start_date'])
+            ->where('datetime', '<=', $validatedData['end_date'])->get();
+
+        // Form response
+        $data = [
+            "income_total" => $transactions->where('is_income', 1)->sum('amount'),
+            'expenses_total' => $transactions->where('is_income', 0)->sum('amount'),
+            'total_transaction' => $transactions->count(),
+        ];
+
+        return $this->commonJsonResponse($data);
+    }
 }
