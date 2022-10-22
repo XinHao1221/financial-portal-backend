@@ -150,7 +150,7 @@ class TransactionController extends Controller
                 return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
             })->where('is_income', 0)->sum('amount');
 
-            array_push($data, [
+            $data = array_merge($data, [
                 "todays_income" => $todaysIncome,
                 "todays_expenses" => $todaysExpenses
             ]);
