@@ -33,4 +33,9 @@ class Transaction extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function scopeCurrentUser($query)
+    {
+        return $query->where('user_id', auth()->user()->id);
+    }
 }

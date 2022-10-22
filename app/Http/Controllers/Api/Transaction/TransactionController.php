@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api\Transaction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
+use App\Traits\DateTimeTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class TransactionController extends Controller
 {
+    use DateTimeTrait;
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +26,7 @@ class TransactionController extends Controller
         ]);
 
         $transactions = Transaction::where('datetime', '>=', $validatedData['start_date'])
-            ->where('datetime', '<=', $validatedData['end_date'])->get();
+            ->where('datetime', '<=', $validatedData['end_date'])->currentUser()->get();
 
         return $this->commonJsonResponse(TransactionResource::collection($transactions));
     }
@@ -119,11 +122,13 @@ class TransactionController extends Controller
 
         $validatedData = $request->validate([
             'start_date' => ['required', 'date_format:Y-m-d H:i:s'],
-            'end_date' => ['required', 'date_format:Y-m-d H:i:s']
+            'end_date' => ['required', 'date_format:Y-m-d H:i:s'],
+            'timezone' => ['timezone']
         ]);
 
+
         $transactions = Transaction::where('datetime', '>=', $validatedData['start_date'])
-            ->where('datetime', '<=', $validatedData['end_date'])->get();
+            ->where('datetime', '<=', $validatedData['end_date'])->currentUser()->get();
 
         // Form response
         $data = [
@@ -131,6 +136,25 @@ class TransactionController extends Controller
             'expenses_total' => $transactions->where('is_income', 0)->sum('amount'),
             'total_transaction' => $transactions->count(),
         ];
+
+        // If the user request todays total
+        if (Arr::get($validatedData, 'timezone')) {
+            // [start, end]
+            $startEndDatetime = $this->getStartEndTimeInUTC($validatedData['timezone']);
+
+            // Calculate total
+            $todaysIncome = $transactions->filter(function ($value) use ($startEndDatetime) {
+                return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
+            })->where('is_income', 1)->sum('amount');
+            $todaysExpenses = $transactions->filter(function ($value) use ($startEndDatetime) {
+                return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
+            })->where('is_income', 0)->sum('amount');
+
+            array_push($data, [
+                "todays_income" => $todaysIncome,
+                "todays_expenses" => $todaysExpenses
+            ]);
+        }
 
         return $this->commonJsonResponse($data);
     }
