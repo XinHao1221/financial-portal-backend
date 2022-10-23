@@ -150,7 +150,7 @@ class TransactionController extends Controller
             // Calculate total
             $todaysIncome = $todaysTransaction->where('is_income', 1)->sum('amount');
             $todaysExpenses = $todaysTransaction->where('is_income', 0)->sum('amount');
-            $totalTransactions = $todaysTransaction->sum();
+            $totalTransactions = $todaysTransaction->count();
 
             $data = array_merge($data, [
                 "todays_income" => $todaysIncome,
