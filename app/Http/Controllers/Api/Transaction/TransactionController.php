@@ -142,17 +142,20 @@ class TransactionController extends Controller
             // [start, end]
             $startEndDatetime = $this->getStartEndTimeInUTC($validatedData['timezone']);
 
+            // Filter only today's transaction
+            $todaysTransaction = $transactions->filter(function ($value) use ($startEndDatetime) {
+                return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
+            });
+
             // Calculate total
-            $todaysIncome = $transactions->filter(function ($value) use ($startEndDatetime) {
-                return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
-            })->where('is_income', 1)->sum('amount');
-            $todaysExpenses = $transactions->filter(function ($value) use ($startEndDatetime) {
-                return $value->datetime >= $this->convertToDatetime($startEndDatetime[0]) && $value->datetime <= $this->convertToDatetime($startEndDatetime[1]);
-            })->where('is_income', 0)->sum('amount');
+            $todaysIncome = $todaysTransaction->where('is_income', 1)->sum('amount');
+            $todaysExpenses = $todaysTransaction->where('is_income', 0)->sum('amount');
+            $totalTransactions = $todaysTransaction->sum();
 
             $data = array_merge($data, [
                 "todays_income" => $todaysIncome,
-                "todays_expenses" => $todaysExpenses
+                "todays_expenses" => $todaysExpenses,
+                'todays_transactions' => $totalTransactions
             ]);
         }
 
