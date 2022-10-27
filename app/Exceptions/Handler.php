@@ -66,8 +66,6 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof ModelNotFoundException) {
-
-            dd($e);
             $modelName = (new \ReflectionClass($e->getModel()))->getShortName();
 
             return response()->json([
