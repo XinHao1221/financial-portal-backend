@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Traits\DateTimeTrait;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -53,7 +52,7 @@ class TransactionController extends Controller
             'is_income' => ['required', 'boolean'],
             'amount' => ['required', 'numeric'],
             'description' => ['string'],
-            'account_id' => 'required', 'exists:accounts,id,user_id,' . auth()->user()->id,
+            'account_id' => ['required', 'exists:accounts,id,user_id,' . auth()->user()->id],
             'category_id' => ['required', 'exists:categories,id,user_id,' . auth()->user()->id],
             'datetime' => ['required', 'date_format:Y-m-d H:i:s']
         ]);
@@ -104,7 +103,20 @@ class TransactionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'is_income' => ['boolean'],
+            'amount' => ['numeric'],
+            'description' => ['string'],
+            'account_id' => ['exists:accounts,id,user_id,' . auth()->user()->id],
+            'category_id' => ['exists:categories,id,user_id,' . auth()->user()->id],
+            'datetime' => ['date_format:Y-m-d H:i:s']
+        ]);
+
+        $transaction = Transaction::where('id', $id)->currentUser()->firstOrFail();
+
+        $transaction->update($validatedData);
+
+        return $this->commonJsonResponse(new TransactionResource($transaction), "Updated Successfully.");
     }
 
     /**
@@ -115,6 +127,10 @@ class TransactionController extends Controller
      */
     public function destroy($id)
     {
+        $transaction = Transaction::where('id', $id)->currentUser()->firstOrFail();
+        $transaction->delete();
+
+        return $this->commonJsonResponse([], "Deleted Successfully.");
     }
 
     public function transactionSummary(Request $request)
