@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-
 class AuthController extends Controller
 {
     public function register(RegisterUserRequest $request)
@@ -34,13 +31,13 @@ class AuthController extends Controller
         $token = $this->createToken($user);
 
         // Return token
-        return response()->json([
-            "message" => "User created successfully",
-            "data" => [
-                "token_type" => "Bearer",
+        return $this->commonJsonResponse(
+            [
+                'token_type' => 'Bearer',
                 'access_token' => $token,
-            ]
-        ]);
+            ],
+            'User created successfully'
+        );
     }
 
     public function createToken($user)
@@ -68,11 +65,22 @@ class AuthController extends Controller
         // Generate token
         $token = $this->createToken($user);
 
-        return response()->json([
-            "data" => [
-                "token_type" => "Bearer",
+        return $this->commonJsonResponse(
+            [
+                'token_type' => 'Bearer',
                 'access_token' => $token,
-            ]
+            ],
+            'Login Successfully'
+        );
+    }
+
+    public function logout(Request $request)
+    {
+        // Remove access token
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout Successfully'
         ]);
     }
 
@@ -81,8 +89,8 @@ class AuthController extends Controller
         // Get current login user
         $user = Auth::user();
 
-        return response()->json([
-            "user" => $user,
+        return $this->commonJsonResponse([
+            'user' => $user
         ]);
     }
 }
