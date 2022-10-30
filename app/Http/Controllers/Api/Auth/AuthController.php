@@ -89,8 +89,6 @@ class AuthController extends Controller
         // Get current login user
         $user = Auth::user();
 
-        return $this->commonJsonResponse([
-            'user' => $user
-        ]);
+        return $this->commonJsonResponse($user);
     }
 }
