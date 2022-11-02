@@ -27,17 +27,8 @@ class AuthController extends Controller
 
         event(new Registered($user));
 
-        // Generate auth token
-        $token = $this->createToken($user);
-
         // Return token
-        return $this->commonJsonResponse(
-            [
-                'token_type' => 'Bearer',
-                'access_token' => $token,
-            ],
-            'User created successfully'
-        );
+        return $this->commonJsonResponse(null, 'User created successfully');
     }
 
     public function createToken($user)
