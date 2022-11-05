@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
 
         // Clear unused auth token everyday at Mindnight
-        $schedule->command('auth:clear-token')->dailyAt('14:00');
+        $schedule->command('auth:clear-token')->dailyAt('14:15');
     }
 
     /**
