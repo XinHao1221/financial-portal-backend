@@ -30,7 +30,7 @@ class ClearAuthTokenCommand extends Command
     public function handle()
     {
         // Substract 30 days from now
-        $minDate = Carbon::now('UTC')->subDays(10);
+        $minDate = Carbon::now('UTC')->subDays(2);
 
         // Remove token which didn't use within 30 days
         DB::table('personal_access_tokens')
